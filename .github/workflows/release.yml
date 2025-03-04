@@ -1,0 +1,76 @@
+# Copyright (c) 2025 The Khronos Group Inc.
+# Copyright (c) 2025 RasterGrid Kft.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'vksc*'
+
+jobs:
+  github-release:
+    name: GitHub Release
+    runs-on: ${{matrix.OS}}
+    defaults:
+      run:
+        shell: pwsh
+    strategy:
+      matrix:
+        include:
+          - OS: windows-2022
+            WORKFLOW: msbuild-ci-windows
+            PACKAGE: ZIP
+          - OS: ubuntu-22.04
+            WORKFLOW: ninja-ci-linux
+            PACKAGE: TGZ
+    steps:
+    - name: Checkout VulkanSC-SDK
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: REUSE Compliance Check
+      if: ${{ contains(matrix.WORKFLOW, 'linux') }}
+      uses: fsfe/reuse-action@v5
+
+    - name: Get latest ninja
+      if: ${{ contains(matrix.WORKFLOW, 'ninja') }}
+      uses: urkle/action-get-ninja@v1
+
+    - name: Get windowing system packages
+      if: ${{ contains(matrix.WORKFLOW, 'linux') }}
+      run: |
+        sudo apt-get -qq update
+        sudo apt install --yes cmake git gcc g++ python3 pkg-config libx11-xcb-dev libwayland-dev xorg-dev
+
+    - name: Configure
+      run: cmake --preset ${{matrix.WORKFLOW}}
+
+    # Check if the CMake project(VERSION) matches the Git tag
+    - name: Check version match
+      run: |
+        if ( -not (`
+          Get-Content ${env:GITHUB_WORKSPACE}\build\CMakeCache.txt | `
+          Select-String -Pattern ('CMAKE_PROJECT_VERSION:STATIC=' + '${{github.ref_name}}'.Replace('vksc','')) `
+        )) `
+        { throw 'CMake project version mismatches Git tag name (without leading "vksc")'}
+
+    - name: Build
+      run: cmake --build --preset ${{matrix.WORKFLOW}}-release-install
+
+    - name: Test
+      run: ctest --preset ${{matrix.WORKFLOW}}-release
+
+    - name: Package
+      run: cpack -G ${{matrix.PACKAGE}} -C Release --config ./build/CPackConfig.cmake -B ./package
+
+    - name: Upload
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        token: ${{ secrets.ACTIONS_CREATE_RELEASE_TOKEN }}
+        files: |
+          package/VulkanSC-SDK-*

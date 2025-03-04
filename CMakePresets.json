@@ -1,0 +1,175 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "layout-ci",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/build",
+			"installDir": "${sourceDir}/install"
+		},
+		{
+			"name": "packaging-ci-linux",
+			"hidden": true,
+			"cacheVariables": {
+				"CPACK_SOURCE_GENERATOR": "TGZ",
+				"CPACK_GENERATOR": "TGZ"
+			}
+		},
+		{
+			"name": "packaging-ci-windows",
+			"hidden": true,
+			"cacheVariables": {
+				"CPACK_SOURCE_GENERATOR": "ZIP",
+				"CPACK_GENERATOR": "ZIP"
+			}
+		},
+		{
+			"name": "generator-ninja-ci",
+			"hidden": true,
+			"generator": "Ninja Multi-Config",
+			"cacheVariables": {
+				"CMAKE_MAKE_PROGRAM": {
+					"type": "FILEPATH",
+					"value": "ninja"
+				}
+			}
+		},
+		{
+			"name": "generator-msbuild-ci",
+			"hidden": true,
+			"generator": "Visual Studio 17 2022",
+			"environment": {
+				"UseMultiToolTask": "true",
+				"EnforceProcessCountAcrossBuilds": "true",
+				"MultiProcMaxCount": "$penv{NUMBER_OF_PROCESSORS}"
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c/c++-gcc-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++"
+			}
+		},
+		{
+			"name": "toolchain-msbuild-c/c++-msvc-ci",
+			"hidden": true,
+			"toolset": {
+				"value": "v143",
+				"strategy": "set"
+			},
+			"architecture": {
+				"value": "x64",
+				"strategy": "set"
+			}
+		},
+		{
+			"name": "cache-args-ci",
+			"hidden": true,
+			"cacheVariables": {
+			}
+		},
+		{
+			"name": "ninja-ci-linux",
+			"displayName": "Ninja Multi-Config & GCC",
+			"inherits": [
+				"layout-ci",
+				"packaging-ci-linux",
+				"generator-ninja-ci",
+				"toolchain-makefiles-c/c++-gcc-ci",
+				"cache-args-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "msbuild-ci-windows",
+			"displayName": "MSBuild & MSVC",
+			"inherits": [
+				"layout-ci",
+				"packaging-ci-windows",
+				"generator-msbuild-ci",
+				"toolchain-msbuild-c/c++-msvc-ci",
+				"cache-args-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "ninja-ci-linux-release-install",
+			"displayName": "Release (install)",
+			"configuration": "Release",
+			"configurePreset": "ninja-ci-linux",
+			"targets": [
+				"install"
+			]
+		},
+		{
+			"name": "msbuild-ci-windows-release-install",
+			"displayName": "Release (install)",
+			"configuration": "Release",
+			"configurePreset": "msbuild-ci-windows",
+			"targets": [
+				"install"
+			],
+			"nativeToolOptions": [
+				"/nologo",
+				"/verbosity:minimal"
+			],
+			"environment": {
+				"CMAKE_BUILD_PARALLEL_LEVEL": "$penv{NUMBER_OF_PROCESSORS}"
+			}
+		}
+	],
+	"testPresets": [
+		{
+			"name": "execution-behavior-ci",
+			"hidden": true,
+			"execution": {
+				"noTestsAction": "error",
+				"stopOnFailure": true
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "ninja-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			],
+			"execution": {
+				"jobs": 3
+			}
+		},
+		{
+			"name": "msbuild-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "msbuild-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			],
+			"environment": {
+				"CTEST_PARALLEL_LEVEL": "$penv{NUMBER_OF_PROCESSORS}"
+			}
+		}
+	]
+}
