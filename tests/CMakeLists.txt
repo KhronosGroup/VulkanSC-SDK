@@ -12,10 +12,10 @@ add_test(NAME Integration.Install
 )
 
 add_test(NAME Integration.FilesExistInInstallTree
-    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesExist.cmake"
+    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}/${PROJECT_VERSION}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesExist.cmake"
 )
 add_test(NAME Integration.FilesAbsentFromInstallTree
-    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesAbsent.cmake"
+    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}/${PROJECT_VERSION}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesAbsent.cmake"
 )
 
 set_tests_properties(
