@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.21.5...4.0)
 enable_testing()
 
 project(VulkanSC-SDK
-    VERSION 1.0.18
+    VERSION 1.0.19
     LANGUAGES NONE
 )
 
