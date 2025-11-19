@@ -129,3 +129,11 @@ The `vksccube` uses the `VK_KHR_display` extension for window-system interaction
 Emulation ICD supports this through display emulation on top of Win32/X11 windows, hence the sample should work with the
 Vulkan SC Emulation ICD on top of any Vulkan implementation supporting these window-systems on Windows and on Linux
 running X11 or Wayland (through XWayland).
+
+
+### License
+
+Copyright (c) 2025 The Khronos Group Inc.
+Copyright (c) 2025 RasterGrid Kft.
+
+The Vulkan SC SDK comprises of Apache 2.0 licensed open-source components from Khronos including. Information about the complete set of components and their source code revisions is available in the source repository of the SDK ([VulkanSC-SDK](https://github.com/KhronosGroup/VulkanSC-SDK)) tagged using the following format `vksc<`_`version`_`>.<`_`patch`_`>` (e.g. `vksc1.0.20`).
