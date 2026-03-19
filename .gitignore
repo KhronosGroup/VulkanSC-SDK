@@ -4,10 +4,14 @@
 # SPDX-License-Identifier: CC-BY-4.0
 
 # Ignore any build directories
-/build
-/install
-/package
+**/build
+**/install
+**/package
 
-/.vscode
-/.vs
+# Ignore CMake user settings
+**/CMakeUserPresets.json
+
+# Ignore IDE configuration
+**/.vscode
+**/.vs
 .DS_Store

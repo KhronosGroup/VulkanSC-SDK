@@ -1,0 +1,86 @@
+# ~~~
+# Copyright (c) 2025 The Khronos Group Inc.
+# Copyright (c) 2025 RasterGrid Kft.
+#
+# SPDX-License-Identifier: Apache-2.0
+# ~~~
+set(vkscHeaders
+    vk_icd.h
+    vk_layer.h
+    vk_platform.h
+    vulkan_android.h
+    vulkan_beta.h
+    vulkan_directfb.h
+    vulkan_fuchsia.h
+    vulkan_ggp.h
+    vulkan_ios.h
+    vulkan_macos.h
+    vulkan_metal.h
+    vulkan_ohos.h
+    vulkan_sc_core.h
+    vulkan_sc_core.hpp
+    vulkan_sc.h
+    vulkan_sci.h
+    vulkan_screen.h
+    vulkan_vi.h
+    vulkan_wayland.h
+    vulkan_win32.h
+    vulkan_xcb.h
+    vulkan_xlib_xrandr.h
+    vulkan_xlib.h
+    pcutil/pcreader.hpp
+    pcutil/pcwriter.hpp
+)
+if(WIN32)
+    set(vkscLibraries vulkansc-1)
+else()
+    set(vkscLibraries vulkansc)
+endif()
+set(vkscICDs
+    vksconvk
+)
+set(vkscPCCs
+    pcconvk
+)
+set(vkscLayers
+    VkSCLayer_khronos_device_simulation
+    VkSCLayer_khronos_validation
+)
+set(vkLayers
+    VkLayer_khronos_json_gen
+)
+set(vkscExecutables
+    vulkanscinfo
+    vksccube
+    vkscpcctool
+)
+set(vkscProgramDatabases
+    ${vkscLayers}
+)
+set(vkscCMakeModules
+    VulkanSCPccDiscovery
+    VulkanSCPccUtilities
+    VulkanSCPcJsonDyndepScanner
+)
+set(vkscCMakeExportInterfaceFiles
+    VulkanSC/VulkanSCConfig
+    VulkanJSONGenLayer/VulkanJSONGenLayerConfig
+    VulkanJSONGenLayer/VulkanJSONGenLayerConfig-release
+    VulkanJSONGenLayer/VulkanJSONGenLayerConfigVersion
+)
+set(vkscLicense
+    LICENSE.txt
+)
+set(vkscDocs
+    README.md
+)
+if(WIN32)
+    set(vkscEnvSetupScripts
+        setup-env.bat
+    )
+else()
+    set(vkscEnvSetupScripts
+        setup-env.sh
+        internal/autosetup-env.sh
+    )
+endif()

@@ -1,23 +1,29 @@
 # ~~~
-# Copyright (c) 2025 The Khronos Group Inc.
-# Copyright (c) 2025 RasterGrid Kft.
+# Copyright (c) 2025-2026 The Khronos Group Inc.
+# Copyright (c) 2025-2026 RasterGrid Kft.
 #
 # SPDX-License-Identifier: Apache-2.0
 # ~~~
-cmake_minimum_required(VERSION 3.21.5...4.0)
+if(WIN32)
+    cmake_minimum_required(VERSION 3.27...4.0) # INNOSETUP is only supported since CMake 3.27
+else()
+    cmake_minimum_required(VERSION 3.21.5...4.0)
+endif()
 enable_testing()
 
 project(VulkanSC-SDK
-    VERSION 1.0.20
-    LANGUAGES NONE
+    VERSION 1.0.21
+    LANGUAGES C
 )
 
 option(VKSC_SDK_BUILD_TESTS "Do consistency checks as CTests" ${PROJECT_IS_TOP_LEVEL})
+option(VKSC_SDK_BUILD_INSTALLERS "Build installers using CPack" ${PROJECT_IS_TOP_LEVEL})
 set(VKSC_SDK_USE_TAG "vksc${PROJECT_VERSION}" CACHE STRING "Tag hash of Khronos release to fetch to test with")
 set(VKSC_SDK_EP_BASE "components" CACHE PATH "Path of external projects (relative to PROJECT_BINARY_DIR)")
 # NOTE: VKSC_SDK_EP_BASE defaults to "components", even though the rest of the ecosystem uses "external" is
 #       to allow conveniently excluding all transitive "external" folders from the source package.
 
+include(GNUInstallDirs)
 include(ExternalProject)
 set_directory_properties(PROPERTIES EP_BASE "${PROJECT_BINARY_DIR}/${VKSC_SDK_EP_BASE}")
 
@@ -33,11 +39,11 @@ foreach(CACHE_ARG IN ITEMS CMAKE_C_COMPILER CMAKE_CXX_COMPILER)
 endforeach()
 
 # CMake regex engine lack quantifiers, so we brute-force 40 hex chars
-set(C "[0-9a-f]")
-set(GIT_TAG_REGEX "${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}${C}")
-unset(C)
+foreach(I RANGE 1 40)
+    string(APPEND GIT_TAG_REGEX "[0-9a-f]")
+endforeach()
 
-foreach(Project IN ITEMS Headers Loader Tools ValidationLayers Emulation)
+foreach(Project IN ITEMS Headers Loader Tools ValidationLayers Emulation pcutil)
     set(${Project}_TAG "${VKSC_SDK_USE_TAG}" CACHE STRING "Tag to use for VulkanSC-${Project}")
     if(${${Project}_TAG} MATCHES "^${GIT_TAG_REGEX}$") # If GIT_TAG is a commit hash, shallow clones don't work (as per docs)
         set(Project_SHALLOW_ARG OFF)
@@ -52,19 +58,20 @@ foreach(Project IN ITEMS Headers Loader Tools ValidationLayers Emulation)
         GIT_SHALLOW            ${Project_SHALLOW_ARG}
         CMAKE_CACHE_ARGS       "${Common_CACHE_ARGS};${${Project}_CACHE_ARGS}"
     )
-    install(DIRECTORY "${PROJECT_BINARY_DIR}/${VKSC_SDK_EP_BASE}/Install/VulkanSC-${Project}/" DESTINATION "${PROJECT_VERSION}" USE_SOURCE_PERMISSIONS)
+    install(DIRECTORY "${PROJECT_BINARY_DIR}/${VKSC_SDK_EP_BASE}/Install/VulkanSC-${Project}/" DESTINATION "." USE_SOURCE_PERMISSIONS)
 endforeach()
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/extras/" DESTINATION "${PROJECT_VERSION}")
 
-set(CPACK_SOURCE_INSTALLED_DIRECTORIES "${PROJECT_BINARY_DIR}/${VKSC_SDK_EP_BASE}/Source/;.")
-set(CPACK_SOURCE_IGNORE_FILES [[\\.git/;/external/]])
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-Source")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/extras/common/" DESTINATION "." USE_SOURCE_PERMISSIONS)
+if(WIN32)
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/extras/windows/" DESTINATION "." USE_SOURCE_PERMISSIONS)
+else()
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/extras/linux/" DESTINATION "." USE_SOURCE_PERMISSIONS)
+endif()
 
-# Must be included AFTER all CPACK_... variables are set
-include(CPack)
 
 if(VKSC_SDK_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
+
+install(SCRIPT cmake/ModifyInstallTree.cmake)
+include(cmake/Package.cmake)
