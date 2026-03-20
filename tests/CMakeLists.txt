@@ -10,17 +10,22 @@ enable_testing()
 add_test(NAME Integration.Install
     COMMAND "${CMAKE_COMMAND}" --install "${PROJECT_BINARY_DIR}" --prefix "${CMAKE_INSTALL_PREFIX}" --config $<CONFIG>
 )
+set_tests_properties(Integration.Install
+    PROPERTIES FIXTURES_SETUP Install
+)
 
 add_test(NAME Integration.FilesExistInInstallTree
-    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}/${PROJECT_VERSION}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesExist.cmake"
+    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}" -D "OUTPUT:PATH=${CMAKE_CURRENT_BINARY_DIR}/ProcessedFiles.cmake" -P "${CMAKE_CURRENT_LIST_DIR}/FilesExist.cmake"
 )
-add_test(NAME Integration.FilesAbsentFromInstallTree
-    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}/${PROJECT_VERSION}" -P "${CMAKE_CURRENT_LIST_DIR}/FilesAbsent.cmake"
+set_tests_properties(Integration.FilesExistInInstallTree
+    PROPERTIES
+        FIXTURES_SETUP ProcessedFiles
+        FIXTURES_REQUIRED Install
 )
 
-set_tests_properties(
-    Integration.FilesExistInInstallTree
-    Integration.FilesAbsentFromInstallTree
-    PROPERTIES
-        DEPENDS Integration.Install
+add_test(NAME Integration.FilesAbsentFromInstallTree
+    COMMAND "${CMAKE_COMMAND}" -D "PREFIX:PATH=${CMAKE_INSTALL_PREFIX}" -D "INPUT:PATH=${CMAKE_CURRENT_BINARY_DIR}/ProcessedFiles.cmake" -P "${CMAKE_CURRENT_LIST_DIR}/FilesAbsent.cmake"
+)
+set_tests_properties(Integration.FilesAbsentFromInstallTree
+    PROPERTIES FIXTURES_REQUIRED "ProcessedFiles;Install"
 )

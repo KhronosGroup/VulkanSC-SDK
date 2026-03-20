@@ -10,9 +10,14 @@ on:
     tags:
       - 'vksc*'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   github-release:
     name: GitHub Release
+    environment: release
     runs-on: ${{matrix.OS}}
     defaults:
       run:
@@ -21,11 +26,13 @@ jobs:
       matrix:
         include:
           - OS: windows-2022
-            WORKFLOW: msbuild-ci-windows
-            PACKAGE: ZIP
+            WORKFLOW: msbuild-windows-ci
+            ARCHIVE: ZIP
+            INSTALLER: INNOSETUP
           - OS: ubuntu-22.04
-            WORKFLOW: ninja-ci-linux
-            PACKAGE: TGZ
+            WORKFLOW: ninja-linux-ci
+            ARCHIVE: TGZ
+            INSTALLER: External
     steps:
     - name: Checkout VulkanSC-SDK
       uses: actions/checkout@v4
@@ -46,6 +53,32 @@ jobs:
         sudo apt-get -qq update
         sudo apt install --yes cmake git gcc g++ python3 pkg-config libx11-xcb-dev libwayland-dev xorg-dev
 
+    - name: Install AzureSignTool
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      run: dotnet tool install --no-cache --global AzureSignTool --version 4.0.1
+
+    - name: Azure login
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZ_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZ_TENANT_ID }}
+        subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
+
+    - name: Azure token
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      run: |
+        $az_token=$(az account get-access-token --scope https://vault.azure.net/.default --query accessToken --output tsv)
+         echo "::add-mask::$az_token"
+         echo "AZ_TOKEN=$az_token" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Azure environment
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      run: |
+        'AZ_TIMESTAMP_URL=${{ secrets.AZ_TIMESTAMP_URL }}' >> $env:GITHUB_ENV
+        'AZ_KEY_VAULT_URL=${{ secrets.AZ_KEY_VAULT_URL }}' >> $env:GITHUB_ENV
+        'AZ_KEY_VAULT_CERTIFICATE=${{ secrets.AZ_KEY_VAULT_CERTIFICATE }}' >> $env:GITHUB_ENV
+
     - name: Configure
       run: cmake --preset ${{matrix.WORKFLOW}}
 
@@ -64,13 +97,35 @@ jobs:
     - name: Test
       run: ctest --preset ${{matrix.WORKFLOW}}-release
 
-    - name: Package
-      run: cpack -G ${{matrix.PACKAGE}} -C Release --config ./build/CPackConfig.cmake -B ./package
+    - name: Package (archive)
+      run: cpack -G ${{matrix.ARCHIVE}} -C Release --config ./build/CPackConfig.cmake -B ./package
 
-    - name: Upload
+    - name: Package (installer)
+      run: cpack -G ${{matrix.INSTALLER}} -C Release --config ./build/CPackConfig.cmake -B ./package
+
+    - name: Azure logout
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      run: |
+        az logout
+        az cache purge
+        az account clear
+
+    - name: Upload (Windows)
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
       uses: softprops/action-gh-release@v2
       with:
         draft: true
         token: ${{ secrets.ACTIONS_CREATE_RELEASE_TOKEN }}
         files: |
-          package/VulkanSC-SDK-*
+          package/VulkanSC-SDK-*.exe
+          package/VulkanSC-SDK-*.zip
+
+    - name: Upload (Linux)
+      if: ${{ contains(matrix.WORKFLOW, 'linux') }}
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        token: ${{ secrets.ACTIONS_CREATE_RELEASE_TOKEN }}
+        files: |
+          package/VulkanSC-SDK-*.run
+          package/VulkanSC-SDK-*.tar.gz

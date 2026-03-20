@@ -6,24 +6,21 @@
 # ~~~
 cmake_minimum_required(VERSION 3.21.5...4.0)
 
-set(vkHeaders
-    vulkan.h
-    vulkan_core.h
-    vulkan_core.hpp
-)
+include("${CMAKE_CURRENT_LIST_DIR}/ExpectedInstallTree.cmake")
+include("${INPUT}")
 
-# Start search for absent files
-foreach(vkHeader IN LISTS vkHeaders)
-    if(EXISTS "${PREFIX}/include/vulkan/${vkHeader}")
-        message(FATAL_ERROR "Vulkan header found: /include/vulkan/${Header}")
-    endif()
-endforeach()
-
-foreach(Folder IN ITEMS
-    "share/vulkan/registry"
-    "share/vulkan/registry/spec_tools"
-)
-    if(EXISTS "${PREFIX}/${Folder}/__pycache__")
-        message(FATAL_ERROR "Python cache found in: ${PREFIX}/${Folder}")
+file(GLOB_RECURSE installTreeEntries LIST_DIRECTORIES ON "${PREFIX}/*")
+foreach(installTreeEntry IN LISTS installTreeEntries)
+    if(IS_DIRECTORY "${installTreeEntry}")
+        file(GLOB dirGlob "${installTreeEntry}/*")
+        list(LENGTH dirGlob dirGlobLen)
+        if(dirGlobLen EQUAL 0)
+            file(RELATIVE_PATH installTreeEntry "${PREFIX}" "${installTreeEntry}")
+            message(FATAL_ERROR "Empty directory found: <prefix>/${installTreeEntry}")
+        endif()
+    else()
+        if(NOT installTreeEntry IN_LIST processedFiles)
+            message(FATAL_ERROR "Extraneous install tree entry found: <prefix>/${installTreeEntry}")
+        endif()
     endif()
 endforeach()
