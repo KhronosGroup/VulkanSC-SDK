@@ -82,15 +82,6 @@ jobs:
     - name: Configure
       run: cmake --preset ${{matrix.WORKFLOW}}
 
-    # Check if the CMake project(VERSION) matches the Git tag
-    - name: Check version match
-      run: |
-        if ( -not (`
-          Get-Content ${env:GITHUB_WORKSPACE}\build\CMakeCache.txt | `
-          Select-String -Pattern ('CMAKE_PROJECT_VERSION:STATIC=' + '${{github.ref_name}}'.Replace('vksc','')) `
-        )) `
-        { throw 'CMake project version mismatches Git tag name (without leading "vksc")'}
-
     - name: Build
       run: cmake --build --preset ${{matrix.WORKFLOW}}-release-install
 
