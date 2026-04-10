@@ -45,8 +45,8 @@ if(CPACK_GENERATOR STREQUAL "INNOSETUP")
     set(CPACK_INNOSETUP_EXTRA_SCRIPTS "${CPACK_VKSCSDK_SOURCE_DIR}/cmake/PackageINNOSETUP.iss")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF) # Avoid CPack Warning: Inno Setup Generator cannot work with CPACK_INCLUDE_TOPLEVEL_DIRECTORY set. This option will be reset to 0 (for this generator only).
 
+    include("${CMAKE_CURRENT_LIST_DIR}/PackageSign.cmake")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/PackageSignContents.cmake")
-    set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/PackageSign.cmake")
 endif()
 
 if(CPACK_GENERATOR STREQUAL "External")
