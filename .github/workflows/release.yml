@@ -47,11 +47,17 @@ jobs:
       if: ${{ contains(matrix.WORKFLOW, 'ninja') }}
       uses: urkle/action-get-ninja@v1
 
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+    - name: install python packages
+      run: python3 -m pip install pyparsing
+
     - name: Get windowing system packages
       if: ${{ contains(matrix.WORKFLOW, 'linux') }}
       run: |
         sudo apt-get -qq update
-        sudo apt install --yes cmake git gcc g++ python3 pkg-config libx11-xcb-dev libwayland-dev xorg-dev
+        sudo apt install --yes cmake git gcc g++ pkg-config libx11-xcb-dev libwayland-dev xorg-dev
 
     - name: Install AzureSignTool
       if: ${{ contains(matrix.WORKFLOW, 'windows') }}

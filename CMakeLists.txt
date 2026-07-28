@@ -12,7 +12,7 @@ endif()
 enable_testing()
 
 project(VulkanSC-SDK
-    VERSION 1.0.21
+    VERSION 1.0.22
     LANGUAGES C
 )
 

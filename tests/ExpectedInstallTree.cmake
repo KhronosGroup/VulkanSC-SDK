@@ -17,17 +17,18 @@ set(vkscHeaders
     vulkan_macos.h
     vulkan_metal.h
     vulkan_ohos.h
+    vulkan_sc.h
     vulkan_sc_core.h
     vulkan_sc_core.hpp
-    vulkan_sc.h
     vulkan_sci.h
     vulkan_screen.h
+    vulkan_ubm.h
     vulkan_vi.h
     vulkan_wayland.h
     vulkan_win32.h
     vulkan_xcb.h
-    vulkan_xlib_xrandr.h
     vulkan_xlib.h
+    vulkan_xlib_xrandr.h
     pcutil/pcreader.hpp
     pcutil/pcwriter.hpp
 )
