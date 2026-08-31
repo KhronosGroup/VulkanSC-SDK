@@ -71,7 +71,13 @@
         },
         {
             "name": "cache-args-ci",
-            "hidden": true
+            "hidden": true,
+            "cacheVariables": {
+                "Loader_TAG": "1cd5e7c4c8d0f64ee405b2664a14f201630baafd",
+                "Tools_TAG": "84bf4a216cc3c6d69725cf41d25508151520b724",
+                "Emulation_TAG": "a05ecc23b8490cd0401cd4e673ff3885c14358ea",
+                "pcutil_TAG": "5153a0315ce9a9f08f59381aeb41a8ce61fc94b6"
+            }
         },
         {
             "name": "ninja-linux-ci",
