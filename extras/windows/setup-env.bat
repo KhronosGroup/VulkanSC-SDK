@@ -7,6 +7,9 @@
 @ECHO OFF
 
 SET VULKANSC_SDK=%~dp0
+REM Need to remove trailing backslash
+SET VULKANSC_SDK=%VULKANSC_SDK:~0,-1%
+
 SET PATH=%VULKANSC_SDK%\bin;%PATH%
 SET VK_ADD_LAYER_PATH=%VULKANSC_SDK%\share\vulkansc\explicit_layer.d
 SET VK_ADD_DRIVER_FILES=%VULKANSC_SDK%\share\vulkansc\icd.d\vksconvk.json
