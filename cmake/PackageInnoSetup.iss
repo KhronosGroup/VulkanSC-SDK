@@ -7,7 +7,7 @@
 #include "environment.iss"
 
 [Tasks]
-Name: "Register"; Description: "Register installed components and environment variables with the system"; Flags: checkedonce
+Name: "Register"; Description: "Register installed components and environment variables with the system"
 
 [Registry]
 ; Set env var to help locating the SDK with tools

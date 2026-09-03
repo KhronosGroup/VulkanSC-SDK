@@ -314,8 +314,16 @@ In addition, the `VK_JSON_FILE_PATH` environment variable needs to be set to the
 
 Note that unlike the Vulkan SC layers shipped with the SDK, the Vulkan JSON Gen Layer is only readily available if the SDK was installed with component registration (see the [Installation](#installation) section for more details) and is not configured by [Manual environment setup](#manual-environment-setup). This is a limitation stemming from the fact that the environment variable names used to configure layer paths (such as `VK_ADD_LAYER_PATH`) are used by both the Vulkan and Vulkan SC loader. Therefore, if not registered with the system during installation, the Vulkan JSON Gen Layer needs to be manually added to the Vulkan layer search path, e.g.:
 
-  * Windows: `set VK_ADD_LAYER_PATH=<sdk-location>/share/vulkan/explicit_layer.d`
-  * Linux: `export VK_ADD_LAYER_PATH=<sdk-location>/share/vulkan/explicit_layer.d`
+  * Windows:
+    ```
+    set PATH=<sdk-location>\bin;%PATH%
+    set VK_ADD_LAYER_PATH=<sdk-location>/share/vulkan/explicit_layer.d
+    ```
+  * Linux:
+    ```
+    export LD_LIBRARY_PATH=<sdk-location>/lib
+    export VK_ADD_LAYER_PATH=<sdk-location>/share/vulkan/explicit_layer.d
+    ```
 
 
 ### CMake integration

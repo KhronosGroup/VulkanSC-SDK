@@ -95,11 +95,11 @@ mark_as_advanced(VulkanSC_LIBRARY)
 if(WIN32)
     find_file(VulkanSC_LIBRARY_RUNTIME_DEPENDENCY
         REQUIRED
-        NAMES NAMES ${_VulkanSC_library_name}.dll
+        NAMES ${_VulkanSC_library_name}.dll
         HINTS
             "$ENV{VULKANSC_SDK}/bin"
     )
-    mark_as_advanced(VulkanSC_LIBRARY)
+    mark_as_advanced(VulkanSC_LIBRARY_RUNTIME_DEPENDENCY)
 endif()
 
 set(VulkanSC_LIBRARIES ${VulkanSC_LIBRARY})
