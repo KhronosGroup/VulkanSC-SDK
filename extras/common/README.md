@@ -84,7 +84,7 @@ The Windows version of the _Vulkan SC SDK_ is available as an [Inno Setup](https
   * The installed ICDs, PCCs, and layers are registered in the Windows registry under `HKLM\Software\Khronos\*`
   * Environment variables (`VULKANSC_SDK`, `PATH` modifications, etc.) and build tools (e.g. CMake packages and utilities) are registered with the system
 
-The latest SDK installed with registration therefore will be readily available to the user without additional environment configuration.
+**Important:** Due to Windows using the JSON manifest filenames as the registry key names, if multiple SDK versions are installed with component registration, multiple instances of the layers and ICDs will show up in the system. Therefore, and in general, if multiple SDK versions are needed side-by-side, we recommend installing the SDKs without component registration and using manual environment setup.
 
 **Note:** The environment variable settings after installation with registration may only be available after restarting the system.
 
@@ -125,6 +125,8 @@ When using the Linux installer package, the installer provides the option to reg
   * Build tools (e.g. CMake packages and utilities) are registered (under `$HOME/.cmake/packages/VulkanSC` for user installs or under `/usr/local/share/cmake/VulkanSC` for root installs)
 
 The installer will also generate a script called `uninstall.sh` in the installation path that can be invoked to uninstall the SDK. This will also unregister the environment variable changes applied in the profile file modified during installation and remove the symlinks from the file system.
+
+**Important:** If multiple SDK installations are performed with component registration through different methods (e.g. user installs and root installs), multiple instances of the components may show up in the system. In general, if multiple SDKs are needed side-by-side, we recommend installing the SDKs without component registration and using manual environment setup.
 
 **Note:** The environment variable settings after installation with registration may only be available after restarting the system and/or opening a new shell/session.
 
