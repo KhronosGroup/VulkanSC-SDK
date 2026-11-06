@@ -17,7 +17,8 @@
             "hidden": true,
             "cacheVariables": {
                 "CPACK_SOURCE_GENERATOR": "TGZ",
-                "CPACK_GENERATOR": "TGZ;External"
+                "CPACK_GENERATOR": "TGZ;External",
+                "Tools_CACHE_ARGS": "-DINSTALL_CUBEVKSC_SRC:BOOL=ON"
             }
         },
         {
@@ -25,7 +26,8 @@
             "hidden": true,
             "cacheVariables": {
                 "CPACK_SOURCE_GENERATOR": "ZIP",
-                "CPACK_GENERATOR": "ZIP;INNOSETUP"
+                "CPACK_GENERATOR": "ZIP;INNOSETUP",
+                "Tools_CACHE_ARGS": "-DINSTALL_CUBEVKSC_SRC:BOOL=ON"
             }
         },
         {

@@ -275,6 +275,8 @@ Custom pipeline cache binaries can be provided to the `vksccube` program as foll
 vkscube --pipeline-cache <custom-binary-file>
 ```
 
+The source of the `vkscube` can be found in the sdk folder under `src/cube-vksc`.
+
 **Note:** The `vksccube` uses the `VK_KHR_display` extension for window-system interaction. The Vulkan SC Emulation ICD supports this through display emulation on top of Win32/X11 windows, hence the sample should work with the Vulkan SC Emulation ICD on top of any Vulkan implementation supporting these window-systems on Windows and on Linux running X11 or Wayland (through XWayland).
 
 
