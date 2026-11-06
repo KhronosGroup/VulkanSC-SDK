@@ -267,15 +267,24 @@ vulkanscinfo --summary
 The [Vulkan SC Cube Demo](https://github.com/KhronosGroup/VulkanSC-Tools/tree/sc_main/cube-vksc) is a graphical sample application that can be used to test Vulkan SC rendering.
 
 The build of `vkscube` packaged into the SDK contains embedded pipeline cache binaries built for the
-[Vulkan SC Emulation driver stack](https://github.com/KhronosGroup/VulkanSC-Emulation/). If you intend to run it with another Vulkan SC implementation, please refer to the [documentation](https://github.com/KhronosGroup/VulkanSC-Tools/blob/sc_main/cube-vksc/README.md).
+[Vulkan SC Emulation driver stack](https://github.com/KhronosGroup/VulkanSC-Emulation/).
+
+If you intend to run `vksccube` with another Vulkan SC implementation, you have the following options:
+
+  1. Rebuild `vksccube` from source using a different pipeline cache compiler
+  2. Rebuild only the pipeline cache binary and run `vksccube` with your custom pipeline cache binary
+
+In order to facilitate both use cases, the SDK includes the source code of `vksccube` under [`src/cube-vksc`](src/cube-vksc/).
+
+Rebuilding `vksccube` is possible from the source code available in the SDK using CMake. In order to rebuild the pipeline cache binary (as part of the build process) with a custom pipeline cache compiler, set the `REBUILD_PIPELINE_CACHE` configuration-time option and follow the instructions in the [PCC discovery and integration](#pcc-discovery-and-integration) section to select your target pipeline cache compiler toolchain and target architecture/device.
+
+In order to manually rebuild only the pipeline cache binary for a specific target architecture or device, compile the pipeline JSON at [src/cube-vksc/cube.pc.json](src/cube-vksc/cube.pc.json) (and the related SPIR-V modules) using the pipeline cache compiler provided by your vendor. Please refer to your vendor's documentation about the command line arguments necessary for manual pipeline cache compilation.
 
 Custom pipeline cache binaries can be provided to the `vksccube` program as follows:
 
 ```
 vkscube --pipeline-cache <custom-binary-file>
 ```
-
-The source of the `vkscube` can be found in the sdk folder under `src/cube-vksc`.
 
 **Note:** The `vksccube` uses the `VK_KHR_display` extension for window-system interaction. The Vulkan SC Emulation ICD supports this through display emulation on top of Win32/X11 windows, hence the sample should work with the Vulkan SC Emulation ICD on top of any Vulkan implementation supporting these window-systems on Windows and on Linux running X11 or Wayland (through XWayland).
 
