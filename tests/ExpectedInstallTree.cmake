@@ -76,6 +76,22 @@ set(vkscLicense
 set(vkscDocs
     README.md
 )
+set(vkscCubeSources
+    CMakeLists.txt
+    bin_to_c_hex_array.cmake
+    cube.frag
+    cube.pc.json
+    cube.vert.spv
+    linmath.h
+    object_type_string_helper.h
+    README.md
+    cube.c
+    cube.frag.spv
+    cube.vert
+    gettime.h
+    logo.ppm.h
+    pipeline_cache.h
+)
 if(WIN32)
     set(vkscEnvSetupScripts
         setup-env.bat

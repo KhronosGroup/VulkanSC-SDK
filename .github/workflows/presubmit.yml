@@ -9,6 +9,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   github-release:
@@ -68,3 +69,10 @@ jobs:
 
     - name: Package (installer)
       run: cpack -G ${{matrix.INSTALLER}} -C Release --config ./build/CPackConfig.cmake -B ./package
+    
+    - name: Test cube-vksc build with SDK
+      run: |
+        ./install/${{ case(contains(matrix.WORKFLOW, 'linux'), 'setup-env.sh', 'setup-env.bat') }}
+        cmake -S ./install/src/cube-vksc -B build-cube-vksc
+        cmake --build build-cube-vksc
+      

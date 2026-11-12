@@ -189,6 +189,13 @@ foreach(vkscFile IN LISTS vkscLicense vkscDocs vkscEnvSetupScripts)
     list(APPEND processedFiles "${PREFIX}/${vkscFile}")
 endforeach()
 
+foreach(vkscCubeSrc IN LISTS vkscCubeSources)
+    if(NOT EXISTS "${PREFIX}/src/cube-vksc/${vkscCubeSrc}")
+        message(FATAL_ERROR "Missing cube-vksc source install tree entry: ${vkscCubeSrc}")
+    endif()
+    list(APPEND processedFiles "${PREFIX}/src/cube-vksc/${vkscCubeSrc}")
+endforeach()
+
 file(GLOB_RECURSE vkscRegistryFile "${PREFIX}/share/vulkan/registry/*")
 if(NOT vkscRegistryFile)
     message(FATAL_ERROR "Missing or empty Vulkan SC registry: /share/vulkan/registry")
