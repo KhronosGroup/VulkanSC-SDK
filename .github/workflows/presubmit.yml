@@ -68,3 +68,39 @@ jobs:
 
     - name: Package (installer)
       run: cpack -G ${{matrix.INSTALLER}} -C Release --config ./build/CPackConfig.cmake -B ./package
+
+    - name: Test cube-vksc build with SDK (No pipeline cache rebuild, linux)
+      if: ${{ contains(matrix.WORKFLOW, 'linux') }}
+      shell: bash
+      run: |
+        . ./install/setup-env.sh
+        rm -rf build-cube-vksc
+        cmake -S ./install/src/cube-vksc -B build-cube-vksc
+        cmake --build build-cube-vksc
+
+    - name: Test cube-vksc build with SDK (Rebuild pipeline cache, linux)
+      if: ${{ contains(matrix.WORKFLOW, 'linux') }}
+      shell: bash
+      run: |
+        . ./install/setup-env.sh
+        rm -rf build-cube-vksc
+        cmake -DREBUILD_PIPELINE_CACHE=ON -S ./install/src/cube-vksc -B build-cube-vksc
+        cmake --build build-cube-vksc
+
+    - name: Test cube-vksc build with SDK (No pipeline cache rebuild, windows)
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      shell: cmd
+      run: |
+        .\install\setup-env.bat
+        rmdir /s /q build-cube-vksc
+        cmake -S .\install\src\cube-vksc -B build-cube-vksc
+        cmake --build build-cube-vksc
+
+    - name: Test cube-vksc build with SDK (Rebuild pipeline cache, windows)
+      if: ${{ contains(matrix.WORKFLOW, 'windows') }}
+      shell: cmd
+      run: |
+        .\install\setup-env.bat
+        rmdir /s /q -rf build-cube-vksc
+        cmake -DREBUILD_PIPELINE_CACHE=ON -S .\install\src\cube-vksc -B build-cube-vksc
+        cmake --build build-cube-vksc
