@@ -9,6 +9,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   github-release:
@@ -91,6 +92,7 @@ jobs:
       if: ${{ contains(matrix.WORKFLOW, 'windows') }}
       shell: cmd
       run: |
+        @echo on
         .\install\setup-env.bat
         rmdir /s /q build-cube-vksc
         cmake -S .\install\src\cube-vksc -B build-cube-vksc
@@ -100,6 +102,7 @@ jobs:
       if: ${{ contains(matrix.WORKFLOW, 'windows') }}
       shell: cmd
       run: |
+        @echo on
         .\install\setup-env.bat
         rmdir /s /q -rf build-cube-vksc
         cmake -DREBUILD_PIPELINE_CACHE=ON -S .\install\src\cube-vksc -B build-cube-vksc
